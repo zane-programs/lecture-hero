@@ -32,7 +32,7 @@ export function useSummary(id: string): SummaryData | undefined {
     pollSummary().then((ready) => {
       // Polling only if needed
       if (!ready) {
-        interval = setInterval(pollSummary, 10000);
+        interval = setInterval(pollSummary, 6000);
       }
     });
 
