@@ -1,0 +1,23 @@
+html,
+body {
+  background-color: var(--global-bg);
+  color: var(--global-fg);
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+body {
+  --global-bg-rgb: 223, 223, 221;
+  --global-fg-rgb: 51, 51, 53;
+
+  --global-bg: rgb(var(--global-bg-rgb));
+  --global-fg: rgb(var(--global-fg-rgb));
+}
+
+body.dark {
+  --global-bg-rgb: 19, 19, 23;
+  --global-fg-rgb: 223, 223, 221;
+}
+
+button {
+  color: var(--global-fg);
+}

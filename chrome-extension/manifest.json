@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "LectureHero",
+  "description": "A study tool for your lecture videos",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "lecturehero_icon_v0.png"
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": [
+        "https://*.panopto.com/Viewer.aspx*",
+        "https://*.panopto.com/*/Viewer.aspx*"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  }
+}

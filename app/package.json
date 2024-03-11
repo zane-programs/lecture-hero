@@ -1,0 +1,15 @@
+{
+  "name": "lecture-hero-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mock-api": "json-server ./mock-api.json --port=5461"
+  },
+  "author": "Zane St. John",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "json-server": "^1.0.0-alpha.23"
+  }
+}
