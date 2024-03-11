@@ -33,6 +33,16 @@ h6 {
   margin-top: 0 !important;
 }
 
+.markdownContent a {
+  color: var(--global-link) !important;
+  text-decoration: underline;
+  transition: opacity 200ms ease;
+}
+.markdownContent a:hover {
+  opacity: 1 !important;
+}
+
+
 /* TopNav */
 .topNav {
   position: sticky;

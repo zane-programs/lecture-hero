@@ -9,11 +9,11 @@ export interface SummaryData {
   data?: string;
 }
 
-export function getSummary(id: string) {
+export function getSummary(id: string): Promise<SummaryData> {
   return _fetchApi<SummaryData>(`/summary/${encodeURIComponent(id)}`);
 }
 
-export function useSummary(id: string) {
+export function useSummary(id: string): SummaryData | undefined {
   const [summaryData, setSummaryData] = useState<SummaryData | undefined>();
 
   useEffect(() => {
@@ -44,6 +44,9 @@ export function useSummary(id: string) {
   return summaryData;
 }
 
-async function _fetchApi<T = any>(endpoint: string, init?: RequestInit) {
+async function _fetchApi<T = any>(
+  endpoint: string,
+  init?: RequestInit
+): Promise<T> {
   return (await (await fetch(API_HOST + endpoint, init)).json()) as T;
 }

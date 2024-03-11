@@ -5,7 +5,6 @@ import { Menu, MenuItem, MenuButton, SubMenu } from "@szhsin/react-menu";
 import { GoShare, GoSun, GoMoon } from "react-icons/go";
 import { useClipboard } from "use-clipboard-copy";
 // import { Tooltip } from "react-tooltip";
-import { asBlob } from "html-docx-js-typescript";
 
 import styles from "./index.module.css";
 import { useApp } from "../../App";
@@ -91,13 +90,6 @@ function TopNav({
           >
             <MenuItem onClick={() => clipboard.copy()}>Copy Link</MenuItem>
             <SubMenu label="Download" direction="left">
-              <MenuItem
-                onClick={async () =>
-                  saveAs((await asBlob(markdownHtml)) as Blob, "notes.docx")
-                }
-              >
-                Microsoft Word (.docx)
-              </MenuItem>
               <MenuItem
                 onClick={() => saveAs(new Blob([markdownContent]), "notes.md")}
               >

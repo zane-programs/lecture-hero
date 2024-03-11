@@ -8,14 +8,17 @@ body {
 body {
   --global-bg-rgb: 223, 223, 221;
   --global-fg-rgb: 51, 51, 53;
+  --global-link-rgb: 28, 120, 235;
 
   --global-bg: rgb(var(--global-bg-rgb));
   --global-fg: rgb(var(--global-fg-rgb));
+  --global-link: rgb(var(--global-link-rgb));
 }
 
 body.dark {
   --global-bg-rgb: 19, 19, 23;
   --global-fg-rgb: 223, 223, 221;
+  --global-link-rgb: 70, 195, 255;
 }
 
 button {
