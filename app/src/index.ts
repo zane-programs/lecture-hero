@@ -1,11 +1,13 @@
 import express from "express";
 import winston from "winston";
 import expressWinston from "express-winston";
-
 import { config as dotenvConfig } from "dotenv";
 
-import MainRouter from "./routes/main";
-import ApiRouter from "./routes/api";
+// DB
+import DBClient from "./utils/db";
+
+// Routes
+import V1Router from "./routes/v1";
 
 // Grab env variables
 dotenvConfig();
@@ -13,6 +15,7 @@ const PORT = process.env.LECTURE_HERO_PORT || 3000;
 
 const app = express();
 app.disable("x-powered-by");
+app.use(express.json());
 
 // Logger
 app.use(
@@ -37,10 +40,41 @@ app.use(
   })
 );
 
-// Register routes
-new MainRouter().register(app, "/");
-new ApiRouter().register(app, "/api");
+// Database client
+const db = new DBClient();
 
-app.all("*", (_, res) => res.status(404).send({ error: "Not Found" }));
+// Connect to database
+db.connect()
+  .then(() => {
+    // Register routes
+    new V1Router(db).register(app, "/v1");
 
-app.listen(PORT, () => console.log("Server listening on port", PORT));
+    // Catch-all 404
+    // app.all("*", (_, res) => res.status(404).send({ error: "Not Found" }));
+
+    // Listen on app port
+    app.listen(PORT, () => console.log("Server listening on port", PORT));
+  })
+  .catch((error) => {
+    console.log("DB Error:");
+    console.error(error);
+    process.exit(1);
+  });
+
+async function cleanUp() {
+  // Disconnect Prisma instance from Postgres
+  await db.disconnect();
+  process.exit(0);
+}
+
+// Thx https://stackoverflow.com/a/49392671
+[
+  `exit`,
+  `SIGINT`,
+  `SIGUSR1`,
+  `SIGUSR2`,
+  `uncaughtException`,
+  `SIGTERM`,
+].forEach((eventType) => {
+  process.on(eventType, cleanUp);
+});
