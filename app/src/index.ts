@@ -8,7 +8,7 @@ import { config as dotenvConfig } from "dotenv";
 import DBClient from "./utils/db";
 
 // Routes
-import V1Router from "./routes/v1/v1";
+import V1Router from "./routes/v1";
 
 // Grab env variables
 dotenvConfig();
