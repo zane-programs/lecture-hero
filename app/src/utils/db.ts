@@ -34,25 +34,30 @@ export default class DBClient {
     });
   }
 
+  async createSummary(username: string, transcript: string, content: string) {
+    this.assertConnected();
+
+    return await this.prisma.notes.create({
+      data: { transcript, content, created_by: username },
+    });
+  }
+
   async checkAuth(username: string, password: string) {
     this.assertConnected();
 
     // Find user and verify they exist
-    const user = await this.prisma.users.findFirst({ where: { username } });
+    const user = await this.prisma.users.findFirst({
+      where: { username },
+    });
     if (!user || !user.password) return false;
 
     // Verify bcrypt hash (`user.password` is a hash, NOT the actual password)
     return await verify(password, user.password);
   }
 
-  async getUsers() {
+  async getSummmary(id: string) {
     this.assertConnected();
-    return await this.prisma.users.findMany();
-  }
-
-  async getNotes() {
-    this.assertConnected();
-    return await this.prisma.notes.findMany();
+    return await this.prisma.notes.findFirst({ where: { id } });
   }
 
   private assertConnected() {

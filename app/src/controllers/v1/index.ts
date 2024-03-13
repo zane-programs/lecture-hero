@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import Controller from "../models/controller";
+import Controller from "../../models/controller";
 
 export default class V1Controller extends Controller {
   constructor() {
@@ -11,7 +11,7 @@ export default class V1Controller extends Controller {
   }
 
   handleHealthCheck(req: Request, res: Response): void {
-    res.status(204).send();
+    res.status(200).send({ data: "ok" });
   }
 
   async handleRegister(req: Request, res: Response): Promise<void> {

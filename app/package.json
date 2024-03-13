@@ -6,12 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
+    "build": "tsc --build",
     "start": "node dist/index.js",
-    "mock-api": "json-server ./mock-api.json --port=5461"
+    "mock-api": "json-server ./mock-api.json --port=5461",
+    "pull-schema": "prisma db pull && prisma generate"
   },
   "author": "Zane St. John",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "concurrently": "^8.2.2",
     "json-server": "^1.0.0-alpha.23",
@@ -23,9 +26,11 @@
   "dependencies": {
     "@node-rs/bcrypt": "^1.10.0",
     "@prisma/client": "^5.11.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "express-winston": "^4.2.0",
+    "openai": "^4.28.4",
     "winston": "^3.12.0"
   }
 }

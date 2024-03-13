@@ -1,7 +1,7 @@
 import { Express, Router } from "express";
-import Route from "../models/route";
-import V1Controller from "../controllers/v1";
-import type DBClient from "../utils/db";
+import Route from "../../models/route";
+import V1Controller from "../../controllers/v1";
+import type DBClient from "../../utils/db";
 import SummaryRouter from "./summary";
 
 export default class V1Router extends Route<V1Controller> {

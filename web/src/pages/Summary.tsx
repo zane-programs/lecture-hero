@@ -12,8 +12,8 @@ function SummaryView({ id }: { id: string }) {
 
   return summaryData?.data ? (
     <MarkdownViewPage
-      title={`Summary for \u201c${summaryData.title}\u201d`}
-      markdownContent={summaryData.data}
+      title={`Summary for \u201c${summaryData.data.id}\u201d`}
+      markdownContent={summaryData.data.content}
     />
   ) : (
     <>Loading...</>

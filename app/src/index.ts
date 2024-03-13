@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import winston from "winston";
 import expressWinston from "express-winston";
 import { config as dotenvConfig } from "dotenv";
@@ -7,15 +8,18 @@ import { config as dotenvConfig } from "dotenv";
 import DBClient from "./utils/db";
 
 // Routes
-import V1Router from "./routes/v1";
+import V1Router from "./routes/v1/v1";
 
 // Grab env variables
 dotenvConfig();
 const PORT = process.env.LECTURE_HERO_PORT || 3000;
 
 const app = express();
+
 app.disable("x-powered-by");
 app.use(express.json());
+// TODO: clarify CORS policy
+app.use(cors());
 
 // Logger
 app.use(
@@ -50,7 +54,7 @@ db.connect()
     new V1Router(db).register(app, "/v1");
 
     // Catch-all 404
-    // app.all("*", (_, res) => res.status(404).send({ error: "Not Found" }));
+    app.all("*", (_, res) => res.status(404).send({ error: "Not Found" }));
 
     // Listen on app port
     app.listen(PORT, () => console.log("Server listening on port", PORT));

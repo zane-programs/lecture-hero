@@ -17,8 +17,9 @@ model users {
 
 model notes {
   id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created    DateTime? @default(now()) @db.Timestamptz(6)
   created_by String?   @db.VarChar(30)
   content    String?
-  created    DateTime? @default(now()) @db.Timestamptz(6)
+  transcript String?
   users      users?    @relation(fields: [created_by], references: [username], onDelete: NoAction, onUpdate: NoAction)
 }
