@@ -21,5 +21,6 @@ model notes {
   created_by String?   @db.VarChar(30)
   content    String?
   transcript String?
+  title      String?   @db.VarChar(100)
   users      users?    @relation(fields: [created_by], references: [username], onDelete: NoAction, onUpdate: NoAction)
 }

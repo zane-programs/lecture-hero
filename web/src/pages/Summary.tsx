@@ -10,10 +10,10 @@ export default function Summary() {
 function SummaryView({ id }: { id: string }) {
   const summaryData = useSummary(id);
 
-  return summaryData?.data ? (
+  return summaryData ? (
     <MarkdownViewPage
-      title={`Summary for \u201c${summaryData.data.id}\u201d`}
-      markdownContent={summaryData.data.content}
+      title={`Summary for \u201c${summaryData.title}\u201d`}
+      markdownContent={summaryData.content}
     />
   ) : (
     <>Loading...</>

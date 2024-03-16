@@ -33,7 +33,9 @@
     return elem;
   }
 
-  function handleSummarizeClick() {
+  function handleSummarizeClick(e) {
+    e.target.innerText = "Summarizing...";
+
     const title = document.querySelector("#deliveryTitle").innerText;
     const transcript = Array.from(
       document.querySelectorAll(
@@ -61,6 +63,7 @@
 
     const lectureHeroButton = createMenuBarButton("Summarize");
     lectureHeroButton.style.fontWeight = "700";
+    lectureHeroButton.style.textAlign = "right";
 
     lectureHeroButton.addEventListener("click", handleSummarizeClick);
 

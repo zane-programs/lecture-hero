@@ -34,11 +34,16 @@ export default class DBClient {
     });
   }
 
-  async createSummary(username: string, transcript: string, content: string) {
+  async createSummary(
+    username: string,
+    title: string,
+    transcript: string,
+    content: string
+  ) {
     this.assertConnected();
 
     return await this.prisma.notes.create({
-      data: { transcript, content, created_by: username },
+      data: { title, transcript, content, created_by: username },
     });
   }
 
@@ -58,6 +63,13 @@ export default class DBClient {
   async getSummmary(id: string) {
     this.assertConnected();
     return await this.prisma.notes.findFirst({ where: { id } });
+  }
+
+  async findSummaryByTranscript(transcript: string) {
+    this.assertConnected();
+    return await this.prisma.notes.findFirst({
+      where: { transcript },
+    });
   }
 
   private assertConnected() {

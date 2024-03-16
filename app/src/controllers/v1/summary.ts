@@ -22,13 +22,30 @@ export default class SummaryController extends Controller {
       return;
     }
 
-    if (typeof req.body?.transcript !== "string") {
-      res.status(400).send({ error: "Missing transcript" });
+    if (
+      typeof req.body?.transcript !== "string" ||
+      typeof req.body?.title !== "string"
+    ) {
+      res.status(400).send({ error: "Missing transcript or title" });
+      return;
+    }
+
+    // Check for existing summary and return if exists
+    const existingSummary = await this.db!.findSummaryByTranscript(
+      req.body.transcript
+    );
+    if (existingSummary) {
+      const { created_by, transcript, ...summaryRecord } = existingSummary;
+      res.status(200).send({ data: summaryRecord });
+      return;
     }
 
     let aiContent: string | null;
     try {
-      aiContent = await this.generateSummaryText(req.body.transcript as string);
+      aiContent = await this.generateSummaryText(
+        req.body.transcript as string,
+        req.body.title as string
+      );
 
       if (!aiContent) throw new Error();
     } catch (e) {
@@ -38,14 +55,16 @@ export default class SummaryController extends Controller {
 
     try {
       // Remove `created_by` from `summaryRecord` sent to user
-      const { created_by, ...summaryRecord } = await this.db!.createSummary(
-        req.auth.username,
-        req.body.transcript as string,
-        aiContent
-      );
+      const { created_by, transcript, ...summaryRecord } =
+        await this.db!.createSummary(
+          req.auth.username,
+          req.body.title as string,
+          req.body.transcript as string,
+          aiContent
+        );
 
       // Send ID of new summary record to client
-      res.status(200).send({ data: summaryRecord });
+      res.status(201).send({ data: summaryRecord });
     } catch (error) {
       // TODO: Create catch-all error handling
       console.error(error);
@@ -69,7 +88,7 @@ export default class SummaryController extends Controller {
         return;
       }
 
-      const { created_by, ...summaryRecord } = summary;
+      const { created_by, transcript, ...summaryRecord } = summary;
       res.status(200).send({ data: summaryRecord });
     } catch (error) {
       console.error(error);
@@ -81,15 +100,14 @@ export default class SummaryController extends Controller {
   /* HELPERS | TODO: Refactor into another file */
 
   private async generateSummaryText(
-    transcript: string
+    transcript: string,
+    title: string
   ): Promise<string | null> {
     const aiResponse = await this.openai.chat.completions.create({
       messages: [
         {
           role: "system",
-          content:
-            "Write detailed lecture notes based on the following transcript. Organize notes into sections, formatting information into lists, headings, and bullet points. Format response as Markdown.\n\n" +
-            transcript,
+          content: `Write detailed lecture notes based on the following transcript. Organize notes into sections, formatting information into lists, headings, and bullet points. Format response as Markdown.\n\nTitle:${title}\n\nTranscript:${transcript}"`,
         },
       ],
       model: "gpt-4-turbo-preview",

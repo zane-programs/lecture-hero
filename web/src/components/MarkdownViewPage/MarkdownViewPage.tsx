@@ -95,7 +95,9 @@ function TopNav({
               >
                 Markdown (.md)
               </MenuItem>
-              <MenuItem onClick={() => saveAs(markdownHtml, "notes.html")}>
+              <MenuItem
+                onClick={() => saveAs(new Blob([markdownHtml]), "notes.html")}
+              >
                 Web Page (.html)
               </MenuItem>
             </SubMenu>
