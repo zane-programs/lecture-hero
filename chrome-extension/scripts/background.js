@@ -2,13 +2,13 @@ const API_HOST = "http://localhost:5461";
 const FRONTEND_HOST = "http://localhost:3000";
 
 chrome.runtime.onMessage.addListener(async function (
-  request,
-  sender,
-  sendResponse
+  request
+  // sender,
+  // sendResponse
 ) {
   if (request?.type === "summarize") {
     console.log("SUMMARIZE", request);
-    
+
     // Grab credentials from storage
     const credentialsRecord = await chrome.storage.sync.get("credentials");
     if (!credentialsRecord) return;
