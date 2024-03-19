@@ -5,6 +5,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.0.19",
+    "@fontsource/ibm-plex-serif": "^5.0.12",
     "@szhsin/react-menu": "^4.1.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

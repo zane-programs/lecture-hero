@@ -87,8 +87,9 @@ class ComputeStack(Stack):
             props.data_aurora_db.secret, "dbname")
 
         # Instantiate container secrets with `DATABASE_URL` for Prisma ORM
-        container_secrets = {
-            "DATABASE_URL": f"postgresql://{db_host}:{db_password}@{db_host}:{db_port}/{db_name}?schema=public"}
+        # container_secrets = {"DATABASE_URL": f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?schema=public"}
+        container_secrets = {"DB_HOST": db_host, "DB_PASSWORD": db_password,
+                             "DB_USER": db_user, "DB_PORT": db_port, "DB_NAME": db_name}
 
         fargate_task_definition.add_container(
             f"{settings.PROJECT_NAME}-app-container",
