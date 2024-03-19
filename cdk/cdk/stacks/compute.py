@@ -78,10 +78,11 @@ class ComputeStack(Stack):
         db_name = ecs.Secret.from_secrets_manager(
             props.data_aurora_db.secret, "dbname")
 
-        # Instantiate container secrets with `DATABASE_URL` for Prisma ORM
-        # container_secrets = {"DATABASE_URL": f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?schema=public"}
+        # Instantiate container secrets with DB info for Prisma ORM
+        # AND OpenAI API key
         container_secrets = {"DB_HOST": db_host, "DB_PASSWORD": db_password,
-                             "DB_USER": db_user, "DB_PORT": db_port, "DB_NAME": db_name}
+                             "DB_USER": db_user, "DB_PORT": db_port, "DB_NAME": db_name,
+                             "OPENAI_API_KEY": ecs.Secret.from_secrets_manager(openai_api_key)}
 
         fargate_task_definition.add_container(
             f"{settings.PROJECT_NAME}-app-container",

@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all npm dependencies
-RUN npm install
+RUN npm install --save-dev
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
@@ -27,4 +27,4 @@ RUN npm run build
 EXPOSE 80
 
 # Command to run the prestart script which should start your application
-CMD ["./prestart.sh"]
+CMD ["sh", "prestart.sh"]
