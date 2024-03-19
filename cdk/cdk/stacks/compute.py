@@ -71,7 +71,7 @@ class ComputeStack(Stack):
         db_port = ecs.Secret.from_secrets_manager(
             props.data_aurora_db.secret, "port")
         db_user = ecs.Secret.from_secrets_manager(
-            props.data_aurora_db.secret, "user")
+            props.data_aurora_db.secret, "username")
         db_password = ecs.Secret.from_secrets_manager(
             props.data_aurora_db.secret, "password")
         # db_name = settings.PROJECT_NAME
