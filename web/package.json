@@ -14,6 +14,7 @@
     "@types/node": "^16.18.87",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
+    "file-saver": "^2.0.5",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "normalize.css": "^8.0.1",
@@ -54,6 +55,8 @@
     ]
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/showdown": "^2.0.6",
     "react-app-rewired": "^2.2.1"
   }
 }
