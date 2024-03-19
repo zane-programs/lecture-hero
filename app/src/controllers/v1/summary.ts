@@ -113,6 +113,8 @@ export default class SummaryController extends Controller {
       model: "gpt-4-turbo-preview",
     });
 
+    console.log("aiResponse", aiResponse);
+
     return aiResponse.choices[0].message.content;
   }
 }
