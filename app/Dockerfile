@@ -4,6 +4,8 @@
 # Use the official Node.js 18 alpine image as a parent image
 FROM node:18-alpine
 
+RUN apk add --no-cache curl
+
 # Set the working directory inside the container to /app
 WORKDIR /app
 
@@ -15,6 +17,7 @@ RUN npm install
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
+COPY prestart.sh prestart.sh
 
 # Build the application using the npm script configured in package.json
 RUN npm run build
