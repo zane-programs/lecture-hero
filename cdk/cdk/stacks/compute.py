@@ -42,13 +42,6 @@ class ComputeStack(Stack):
             description="API Key for OpenAI LLMs"
         )
 
-        # TODO: Add Datadog integration once ready
-        datadog_api_key = secretsmanager.Secret(
-            self,
-            f"{settings.PROJECT_NAME}-datadog-api-key",
-            description="API Key for Datadog observability"
-        )
-
         # ECS Fargate task definition
         fargate_task_definition = ecs.FargateTaskDefinition(
             self,
@@ -65,8 +58,7 @@ class ComputeStack(Stack):
             ),
         )
 
-        # Grant Fargate task definition access to Datadog & OpenAI API keys
-        datadog_api_key.grant_read(fargate_task_definition.task_role)
+        # Grant Fargate task definition access to OpenAI API keys
         openai_api_key.grant_read(fargate_task_definition.task_role)
         # Grant Fargate task definition access to DB
         props.data_aurora_db.secret.grant_read(
@@ -114,16 +106,7 @@ class ComputeStack(Stack):
             # See: https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/HealthCheck.html#aws_cdk.aws_ecs.HealthCheck
             health_check=ecs.HealthCheck(
                 command=["CMD-SHELL", "curl -f http://localhost/v1/health/ || exit 1"]),
-            # Datadog deployment details
-            # TODO: Datadog
-            docker_labels={
-                "com.datadoghq.ad.instances": '[{"host": "%%host%%", "port": 80}]',
-                "com.datadoghq.ad.check_names": '["lecturehero-ecs"]',
-                "com.datadoghq.ad.init_configs": "[{}]",
-            }
         )
-
-        # TODO: add Datadog sidecar (?)
 
         # FILLMEIN DONE: Finish the Fargate service backend deployment
         fargate_service = ecs_patterns.ApplicationLoadBalancedFargateService(
