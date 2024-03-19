@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
@@ -15,6 +17,7 @@ CREATE TABLE "notes" (
     "created_by" VARCHAR(30),
     "content" TEXT,
     "transcript" TEXT,
+    "title" VARCHAR(100),
 
     CONSTRAINT "notes_pkey" PRIMARY KEY ("id")
 );

@@ -106,7 +106,7 @@ class ComputeStack(Stack):
                 name=f"{settings.PROJECT_NAME}-fargate-container-port-mapping", container_port=80, app_protocol=ecs.AppProtocol.http)],
             environment={
                 "NODE_ENVPRODUCTION": "prodution",
-                "DEBUG": "false",
+                "LECTURE_HERO_PORT": "80"
             },
             # Inject DB secrets into container
             secrets=container_secrets,
