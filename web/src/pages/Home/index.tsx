@@ -5,7 +5,7 @@ import { createAccount } from "../../utils/api";
 import CHROME_EXTENSION_ZIP_FILE from "../../assets/lecturehero-chrome-extension.zip";
 
 export default function Home() {
-  const [accountWasCreated, setAccountWasCreated] = useState(true);
+  const [accountWasCreated, setAccountWasCreated] = useState(false);
 
   return (
     <main className={styles.homeMain}>
