@@ -78,7 +78,7 @@ function InstallationInstructions() {
         downloading the Chrome extension.
       </p>
       <p>
-        <a href="/" target="_blank">
+        <a href="https://youtu.be/7vUBtNgY49g" target="_blank">
           Click here
         </a>{" "}
         to watch tutorial video
@@ -100,6 +100,10 @@ function InstallationInstructions() {
         <li>Click on extension icon (blue book-looking icon) in menu bar</li>
         <li>
           Fill in your newly created username and password, then click "save"
+        </li>
+        <li>
+          Visit any Panopto course video, and click the &ldquo;Summarize&rdquo;
+          button in the top-right hand corner!
         </li>
       </ol>
     </div>
