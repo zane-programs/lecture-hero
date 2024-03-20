@@ -167,25 +167,26 @@ class ComputeStack(Stack):
             default_root_object="index.html",
             # Frontend 404 error => redirect to index.html
             error_responses=[cloudfront.ErrorResponse(
-                http_status=404, response_page_path="/index.html")],
+                # Catch-all with http status 200 (for react router)
+                http_status=404, response_http_status=200, response_page_path="/index.html")],
             # Default behavior: origin from S3 frontend bucket
             default_behavior=cloudfront.BehaviorOptions(
                 origin=cloudfront_origins.S3Origin(
                     frontend_bucket, origin_access_identity=access_identity),
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
             ),
-            additional_behaviors={"/api/*": cloudfront.BehaviorOptions(
-                origin=cloudfront_origins.HttpOrigin(
-                    f"api.{settings.APP_DOMAIN}"),
-                # Disable caching on api requests
-                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
-                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-                # Allow all HTTP methods
-                allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
-                # Allow all headers via `cloudfront.OriginRequestPolicy`
-                origin_request_policy=cloudfront.OriginRequestPolicy(
-                    self, f"{settings.PROJECT_NAME}-frontend-api-orp", header_behavior=cloudfront.OriginRequestHeaderBehavior.deny_list("Host"))
-            )}
+            # additional_behaviors={"/api/*": cloudfront.BehaviorOptions(
+            #     origin=cloudfront_origins.HttpOrigin(
+            #         f"api.{settings.APP_DOMAIN}"),
+            #     # Disable caching on api requests
+            #     cache_policy=cloudfront.CachePolicy.CACHING_DISABLED,
+            #     viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            #     # Allow all HTTP methods
+            #     allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+            #     # Allow all headers via `cloudfront.OriginRequestPolicy`
+            #     origin_request_policy=cloudfront.OriginRequestPolicy(
+            #         self, f"{settings.PROJECT_NAME}-frontend-api-orp", header_behavior=cloudfront.OriginRequestHeaderBehavior.deny_list("Host"))
+            # )}
         )
 
         # DNS A record for Cloudfront frontend
