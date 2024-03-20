@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
 export const API_HOST =
-  // process.env.NODE_ENV === "production"
-  true ? "https://api.lecturehero.net" : "http://localhost:5461";
+  process.env.NODE_ENV === "production"
+    ? "https://api.lecturehero.net"
+    : "http://localhost:5461";
 
 export interface SummaryData {
   id: string;
