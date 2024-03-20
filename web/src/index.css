@@ -3,6 +3,7 @@ body {
   background-color: var(--global-bg);
   color: var(--global-fg);
   font-family: "IBM Plex Sans", sans-serif;
+  line-height: 1.6em;
 }
 
 body {
@@ -23,4 +24,14 @@ body.dark {
 
 button {
   color: var(--global-fg);
+}
+
+a {
+  color: var(--global-link) !important;
+  text-decoration: underline;
+  transition: opacity 200ms ease;
+  opacity: 0.9;
+}
+a:hover {
+  opacity: 1 !important;
 }

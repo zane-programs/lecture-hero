@@ -1,0 +1,73 @@
+.homeMain {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.createAccountContainer {
+  /* width: 100vw;
+  height: 100vh; */
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 1em;
+
+  text-align: center;
+}
+
+.createAccountContainer ol {
+  text-align: left;
+  margin-right: auto;
+}
+
+.createAccountContainer h1 {
+  padding-bottom: 0.3em;
+}
+
+.createAccountContainer h1,
+p {
+  margin: 0;
+}
+
+.createAccountContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-top: 1em;
+
+  width: 100%;
+}
+
+.createAccountContainer form button[type="submit"] {
+  background-color: rgba(var(--global-fg-rgb), 0);
+  color: var(--global-fg);
+  transition: color 175ms ease, background-color 175ms ease;
+
+  margin-top: 0.5em;
+  padding: 0.6em;
+  border-radius: 0.35em;
+  border: 1px solid var(--global-fg);
+
+  cursor: pointer;
+}
+
+.createAccountContainer form button[type="submit"]:hover,
+.createAccountContainer form button[type="submit"]:focus-visible {
+  background-color: rgba(var(--global-fg-rgb), 1);
+  color: var(--global-bg);
+}
+
+.createAccountContainer form input {
+  border-radius: 0.35em;
+  padding: 0.4em 0.6em;
+
+  border: 1px solid var(--gloabl-fg);
+}

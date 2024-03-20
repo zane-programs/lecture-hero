@@ -35,6 +35,7 @@ export default class V1Controller extends Controller {
       if ((error || (undefined as any))?.meta.target.includes("username")) {
         // 422 Unprocessable Entity
         res.status(422).send({ error: "Username unavailable" });
+        return;
       }
 
       // Otherwise generic 500

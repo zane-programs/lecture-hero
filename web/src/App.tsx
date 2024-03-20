@@ -2,8 +2,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Summary from "./pages/Summary";
 import { createContext, useContext, useEffect, useState } from "react";
+import Home from "./pages/Home";
 
 const router = createBrowserRouter([
+  { path: "/", element: <Home /> },
   { path: "/summary/:id", element: <Summary /> },
 ]);
 

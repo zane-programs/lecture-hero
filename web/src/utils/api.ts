@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 export const API_HOST =
-  process.env.NODE_ENV === "production"
-    ? "https://lecturehero.net/api"
-    : "http://localhost:5461";
+  // process.env.NODE_ENV === "production"
+  true ? "https://api.lecturehero.net" : "http://localhost:5461";
 
 export interface SummaryData {
   id: string;
@@ -15,36 +14,11 @@ export interface SummaryData {
 }
 
 export function getSummary(id: string): Promise<SummaryData> {
-  return _fetchApi<SummaryData>(`/v1/summary/get/${encodeURIComponent(id)}`);
+  return fetchApi<SummaryData>(`/v1/summary/get/${encodeURIComponent(id)}`);
 }
 
 export function useSummary(id: string): SummaryData | undefined {
   const [summaryData, setSummaryData] = useState<SummaryData | undefined>();
-
-  // useEffect(() => {
-  //   let interval: NodeJS.Timer;
-
-  //   async function pollSummary() {
-  //     const data = await getSummary(id);
-  //     if (data.ready) {
-  //       clearInterval(interval);
-  //     }
-  //     setSummaryData(data);
-
-  //     return data.ready;
-  //   }
-
-  //   pollSummary().then((ready) => {
-  //     // Polling only if needed
-  //     if (!ready) {
-  //       interval = setInterval(pollSummary, 6000);
-  //     }
-  //   });
-
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [id]);
 
   useEffect(() => {
     async function fetchData() {
@@ -56,8 +30,19 @@ export function useSummary(id: string): SummaryData | undefined {
   return summaryData;
 }
 
+export async function createAccount(
+  username: string,
+  password: string
+): Promise<void> {
+  await fetchApi<any>("/v1/register", {
+    method: "PUT",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+}
+
 // This function is a crime against TypeScript.
-async function _fetchApi<T = any>(
+export async function fetchApi<T = any>(
   endpoint: string,
   init?: RequestInit
 ): Promise<T> {

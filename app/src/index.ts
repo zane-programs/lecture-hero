@@ -77,7 +77,7 @@ async function cleanUp() {
   `SIGINT`,
   `SIGUSR1`,
   `SIGUSR2`,
-  `uncaughtException`,
+  // `uncaughtException`,
   `SIGTERM`,
 ].forEach((eventType) => {
   process.on(eventType, cleanUp);

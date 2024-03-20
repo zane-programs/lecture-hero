@@ -1,41 +1,53 @@
-const API_HOST = "http://localhost:5461";
-const FRONTEND_HOST = "http://localhost:3000";
+const API_HOST = "https://api.lecturehero.net";
+const FRONTEND_HOST = "https://lecturehero.net";
 
-chrome.runtime.onMessage.addListener(async function (
-  request
-  // sender,
-  // sendResponse
-) {
+chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
   if (request?.type === "summarize") {
-    console.log("SUMMARIZE", request);
-
-    // Grab credentials from storage
-    const credentialsRecord = await chrome.storage.sync.get("credentials");
-    if (!credentialsRecord) return;
-    const { credentials } = credentialsRecord;
-
-    // Enforce title and transcript data types
-    if (
-      !request.data ||
-      typeof request.data.title !== "string" ||
-      typeof request.data.transcript !== "string"
-    ) {
-      return;
-    }
-
-    const summaryId = await createSummary(
-      request.data.title,
-      request.data.transcript,
-      credentials
-    );
-
-    chrome.tabs.create({
-      url: FRONTEND_HOST + "/summary/" + encodeURIComponent(summaryId),
-    });
-
-    // request.data
+    handleSummarize(request).then((summaryId) => sendResponse(summaryId));
+    // true for async handling
+    return true;
+  } else if (
+    request?.type === "openSummary" &&
+    typeof request.data?.id === "string"
+  ) {
+    // open summary view if already has id
+    openSummary(request.data.id);
   }
 });
+
+function openSummary(summaryId) {
+  chrome.tabs.create({
+    url: FRONTEND_HOST + "/summary/" + encodeURIComponent(summaryId),
+  });
+}
+
+async function handleSummarize(request) {
+  console.log("SUMMARIZE REQUEST DATA", request);
+
+  // Grab credentials from storage
+  const credentialsRecord = await chrome.storage.sync.get("credentials");
+  if (!credentialsRecord) return;
+  const { credentials } = credentialsRecord;
+
+  // Enforce title and transcript data types
+  if (
+    !request.data ||
+    typeof request.data.title !== "string" ||
+    typeof request.data.transcript !== "string"
+  ) {
+    return;
+  }
+
+  const summaryId = await createSummary(
+    request.data.title,
+    request.data.transcript,
+    credentials
+  );
+
+  openSummary(summaryId);
+
+  return summaryId;
+}
 
 async function createSummary(title, transcript, credentials) {
   const { id } = await _fetchApi(
