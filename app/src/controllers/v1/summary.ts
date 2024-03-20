@@ -49,7 +49,9 @@ export default class SummaryController extends Controller {
 
       if (!aiContent) throw new Error();
     } catch (e) {
-      res.status(500).send("OpenAI API error");
+      res
+        .status(500)
+        .send({ error: "OpenAI API error", data: (e as any)?.toString() ?? e });
       return;
     }
 

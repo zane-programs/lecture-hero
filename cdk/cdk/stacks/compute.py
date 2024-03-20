@@ -106,10 +106,10 @@ class ComputeStack(Stack):
             secrets=container_secrets,
             # See: https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_ecs/HealthCheck.html#aws_cdk.aws_ecs.HealthCheck
             health_check=ecs.HealthCheck(
-                command=["CMD-SHELL", "curl -f http://localhost/v1/health/ || exit 1"]),
+                command=["CMD-SHELL", "curl -f http://localhost/v1/health/ || exit 1"])
         )
 
-        # FILLMEIN DONE: Finish the Fargate service backend deployment
+        # Fargate service backend deployment
         fargate_service = ecs_patterns.ApplicationLoadBalancedFargateService(
             self,
             f"{settings.PROJECT_NAME}-fargate-service",
@@ -123,7 +123,10 @@ class ComputeStack(Stack):
             certificate=props.network_backend_certificate,
             # Redirect requests to port 80 => port 443
             redirect_http=True,
-            domain_zone=props.network_hosted_zone
+            domain_zone=props.network_hosted_zone,
+            # # Private with NAT to allow egress for OpenAI API
+            # task_subnets=ec2.SubnetSelection(subnets=props.network_vpc.select_subnets(
+            #     subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT).subnets)
         )
 
         # Health check

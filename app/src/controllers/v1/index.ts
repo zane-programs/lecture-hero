@@ -7,7 +7,7 @@ export default class V1Controller extends Controller {
   }
 
   handleIndex(req: Request, res: Response): void {
-    res.status(200).send({ data: "Hello from V1Controller!" });
+    res.status(200).send({ data: "Hello, World!" });
   }
 
   handleHealthCheck(req: Request, res: Response): void {
