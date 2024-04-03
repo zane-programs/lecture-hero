@@ -10,7 +10,9 @@ Comprised of a proof-of-concept Chrom{e, ium} extension (`chrome-extension`), we
 
 ## Chrome Extension (`chrome-extension`)
 
-For purposes of the proof of concept, the browser extension takes username and password
+The Chrome extension injects a button into the navigation bar of a Panopto course video that allows a user to easily generate or view a summary for a given lecture video. When clicked, the button grabs a transcript of the lecture from Panopto and provides it to the API to generate a summary.
+
+For purposes of the proof of concept, the browser extension stores username and password and authenticates each request to the LectureHero API with a Basic auth-like authorization scheme (I called it LazyAuth, haha!).
 
 ## Web Application
 
