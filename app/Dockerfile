@@ -1,6 +1,3 @@
-# NOTE: I used ChatGPT to generate this Dockerfile.
-# -Zane
-
 # Use the official Node.js 18 alpine image as a parent image
 FROM node:18-alpine
 
