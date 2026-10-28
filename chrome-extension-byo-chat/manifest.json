@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "LectureHero BYO Chat",
+  "version": "2.0.0",
+  "minimum_chrome_version": "114",
+  "description": "Bring your Panopto lectures to your own ChatGPT. No LectureHero account or server.",
+  "action": {
+    "default_popup": "html/popup.html",
+    "default_icon": "img/icon.png"
+  },
+  "icons": {
+    "128": "img/icon.png"
+  },
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.panopto.com/Viewer.aspx*",
+        "https://*.panopto.com/*/Viewer.aspx*"
+      ],
+      "js": [
+        "scripts/core.js",
+        "scripts/ui.js",
+        "scripts/content.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "scripts/chatgpt.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "styles/ui.css"
+      ],
+      "matches": [
+        "https://*.panopto.com/*"
+      ]
+    }
+  ]
+}
