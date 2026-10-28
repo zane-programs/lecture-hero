@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "LectureHero BYO Chat",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "minimum_chrome_version": "114",
-  "description": "Bring your Panopto lectures to your own ChatGPT. No LectureHero account or server.",
+  "description": "Bring Panopto lectures to your own ChatGPT, Claude, or Gemini. No LectureHero account or server.",
   "action": {
     "default_popup": "html/popup.html",
     "default_icon": "img/icon.png"
@@ -33,10 +33,13 @@
     },
     {
       "matches": [
-        "https://chatgpt.com/*"
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
       ],
       "js": [
-        "scripts/chatgpt.js"
+        "scripts/core.js",
+        "scripts/chat.js"
       ]
     }
   ],

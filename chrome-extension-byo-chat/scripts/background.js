@@ -1,9 +1,8 @@
 importScripts('core.js');
 const TTL = 30 * 60 * 1000;
-const CHAT = 'https://chatgpt.com/';
 const key = id => `transfer:${id}`;
 function isChat(sender) {
-  try { return sender.frameId === 0 && new URL(sender.url).origin === 'https://chatgpt.com'; } catch { return false; }
+  return sender.frameId === 0 && !!sender.tab && !!LH.providerForUrl(sender.url);
 }
 function isSource(sender) {
   if (sender.url === chrome.runtime.getURL('html/popup.html')) return true;
@@ -20,12 +19,14 @@ async function cleanup() {
 async function handle(message, sender) {
   await cleanup();
   if (message.type === 'LH_TRANSFER' && isSource(sender)) {
+    const providerId = message.provider ?? 'chatgpt';
+    const provider = LH.getProvider(providerId);
     const text = LH.buildMessage(message.draft);
     const tab = await chrome.tabs.create({ url: 'about:blank' });
-    const transfer = { text, created: Date.now() };
+    const transfer = { text, provider: providerId, created: Date.now() };
     try {
       await chrome.storage.session.set({ [key(tab.id)]: transfer, latest: transfer });
-      await chrome.tabs.update(tab.id, { url: CHAT });
+      await chrome.tabs.update(tab.id, { url: provider.url });
     } catch (error) {
       await chrome.storage.session.remove(key(tab.id));
       await chrome.tabs.remove(tab.id).catch(() => {});
@@ -33,13 +34,18 @@ async function handle(message, sender) {
     }
     return { ok: true };
   }
-  if (message.type === 'LH_PENDING' && isChat(sender)) {
+  if (['LH_PENDING', 'LH_DONE'].includes(message.type) && isChat(sender)) {
     const data = await chrome.storage.session.get(key(sender.tab.id));
-    return { ok: true, transfer: data[key(sender.tab.id)] || null };
-  }
-  if (message.type === 'LH_DONE' && isChat(sender)) {
-    await chrome.storage.session.remove(key(sender.tab.id));
-    return { ok: true };
+    const transfer = data[key(sender.tab.id)];
+    // Legacy handoffs from v2.0 belong to ChatGPT. Never release across providers.
+    if (!transfer || (transfer.provider ?? 'chatgpt') !== LH.providerForUrl(sender.url)) {
+      return { ok: true, transfer: null };
+    }
+    if (message.type === 'LH_DONE') {
+      await chrome.storage.session.remove(key(sender.tab.id));
+      return { ok: true };
+    }
+    return { ok: true, transfer };
   }
   if (message.type === 'LH_RECOVER' && sender.url === chrome.runtime.getURL('html/popup.html')) {
     return { ok: true, transfer: (await chrome.storage.session.get('latest')).latest || null };
@@ -52,7 +58,7 @@ async function handle(message, sender) {
 }
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (!message?.type?.startsWith('LH_') || message.type === 'LH_CAPTURE') return;
-  handle(message, sender).then(respond).catch(error => respond({ ok: false, error: error.message || 'Unable to open ChatGPT. Copy the draft instead.' }));
+  handle(message, sender).then(respond).catch(error => respond({ ok: false, error: error.message || 'Unable to open your chat. Copy the draft instead.' }));
   return true;
 });
 chrome.tabs.onRemoved.addListener(id => { chrome.storage.session.remove(key(id)); });

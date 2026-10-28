@@ -2,7 +2,7 @@
 
 ## BYO Chat offshoot
 
-The standalone [LectureHero BYO Chat extension](chrome-extension-byo-chat/README.md) preserves the original Panopto transcript extraction and adds a redesigned in-page panel, editable study prompts, and a direct draft handoff to your own ChatGPT account. It requires no LectureHero backend or API key. Load `chrome-extension-byo-chat` unpacked in Chrome; see its README for installation and usage.
+The standalone [LectureHero BYO Chat extension](chrome-extension-byo-chat/README.md) preserves the original Panopto transcript extraction and adds a redesigned in-page panel, editable study prompts, and a direct draft handoff to your own ChatGPT, Claude, or Gemini account. It requires no LectureHero backend or API key. Load `chrome-extension-byo-chat` unpacked in Chrome; see its README for installation and usage.
 
 ## About
 

@@ -4,7 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const { JSDOM } = require('jsdom');
-const { extract, buildMessage, presets } = require('../scripts/core.js');
+const LH = require('../scripts/core.js');
+const { extract, buildMessage, presets, providers } = LH;
 const script = name => fs.readFileSync(path.join(__dirname, '../scripts', name), 'utf8');
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const draft = { title: 'Lecture 1', transcript: 'First concept. Second concept.', prompt: presets.notes.prompt };
@@ -43,7 +44,7 @@ function background() {
       remove: async () => {}, onRemoved: { addListener: f => removed = f }
     }
   };
-  vm.runInNewContext(script('background.js'), { chrome, importScripts() {}, LH: { buildMessage }, URL, Date });
+  vm.runInNewContext(script('background.js'), { chrome, importScripts() {}, LH, URL, Date });
   return { data, calls, removed: id => removed(id), send: (type, sender, extra = {}) => new Promise(resolve => listener({ type, ...extra }, sender, resolve)) };
 }
 const source = { frameId: 0, url: 'https://school.panopto.com/Panopto/Pages/Viewer.aspx?id=1', tab: { id: 1 } };
@@ -84,21 +85,28 @@ test('panel captures captions, edits prompt, previews safely, transfers, and rep
   assert.equal(w.document.querySelectorAll('img').length, 0);
   $('preset').value = 'quiz'; $('preset').dispatchEvent(new w.Event('change'));
   assert.match($('preview').value, /practice quiz/);
-  $('send').click(); await tick(); assert.equal(sent.type, 'LH_TRANSFER'); assert.equal($('send').disabled, false);
+  $('provider').value = 'claude'; $('provider').dispatchEvent(new w.Event('change'));
+  assert.match($('send').textContent, /Claude/);
+  $('send').click(); await tick(); assert.equal(sent.provider, 'claude'); assert.equal(sent.type, 'LH_TRANSFER'); assert.equal($('send').disabled, false);
   $('transcript').value = ''; $('send').click(); await tick(); assert.match($('status').textContent, /transcript first/);
   d.window.close();
 });
-async function chatFixture(value = '') {
-  const d = dom('<textarea id="prompt-textarea"></textarea>', 'https://chatgpt.com/'); const w = d.window;
+async function chatFixture(value = '', provider = 'chatgpt', html) {
+  const markup = html || (provider === 'chatgpt' ? '<textarea id="prompt-textarea"></textarea>' : provider === 'claude' ? '<div contenteditable="true" class="ProseMirror" role="textbox"></div>' : '<rich-textarea><div class="ql-editor" contenteditable="true" role="textbox"></div></rich-textarea>');
+  const d = dom(markup, providers[provider].url); const w = d.window;
+  const editor = w.document.querySelector(providers[provider].editor);
+  w.document.execCommand = (command, ui, text) => {
+    assert.equal(command, 'insertText'); editor.textContent = text; return true;
+  };
   let interval; let done = false; let root;
   const attach = w.Element.prototype.attachShadow;
   w.Element.prototype.attachShadow = function(options) { root = attach.call(this, { ...options, mode: 'open' }); return root; };
   w.HTMLElement.prototype.getClientRects = () => [1];
   w.setInterval = f => { interval = f; return 1; }; w.clearInterval = () => {};
-  w.chrome = { runtime: { sendMessage: async m => { if (m.type === 'LH_DONE') done = true; return { transfer: { text: buildMessage(draft) } }; } } };
-  w.document.querySelector('textarea').value = value;
-  w.eval(script('chatgpt.js')); await tick();
-  return { d, w, root, run: () => interval(), done: () => done };
+  w.chrome = { runtime: { sendMessage: async m => { if (m.type === 'LH_DONE') done = true; return { transfer: { text: buildMessage(draft), provider } }; } } };
+  if (editor.tagName === 'TEXTAREA') editor.value = value; else editor.textContent = value;
+  w.eval(script('core.js')); w.eval(script('chat.js')); await tick();
+  return { d, w, root, editor, run: () => interval(), done: () => done };
 }
 test('ChatGPT adapter inserts full draft without submitting it', async () => {
   const f = await chatFixture(); f.run(); await tick();
@@ -117,4 +125,60 @@ test('manifest has only scoped content scripts and no backend permissions', () =
   assert.equal(manifest.host_permissions, undefined);
   assert.deepEqual(manifest.permissions, ['storage', 'clipboardWrite', 'activeTab']);
   for (const entry of manifest.content_scripts) for (const file of entry.js) assert.ok(fs.existsSync(path.join(__dirname, '..', file)));
+});
+
+for (const [provider, config] of Object.entries(providers)) {
+  test(`${config.label}: routes to selected service and blocks cross-provider reads and acknowledgements`, async () => {
+    const bg = background();
+    assert.equal((await bg.send('LH_TRANSFER', source, { draft, provider })).ok, true);
+    assert.equal(bg.calls[1][1].url, config.url);
+    for (const [other, otherConfig] of Object.entries(providers)) {
+      const sender = { frameId: 0, tab: { id: 10 }, url: otherConfig.url };
+      const result = await bg.send('LH_PENDING', sender);
+      if (other === provider) assert.equal(result.transfer.text, buildMessage(draft));
+      else {
+        assert.equal(result.transfer, null);
+        await bg.send('LH_DONE', sender);
+        assert.ok(bg.data['transfer:10']);
+      }
+    }
+    assert.equal((await bg.send('LH_PENDING', { ...chat(10), url: config.url.replace('https:', 'http:') })).ok, false);
+    assert.equal((await bg.send('LH_PENDING', { ...chat(10), url: config.url.replace(new URL(config.url).hostname, new URL(config.url).hostname + '.evil.test') })).ok, false);
+  });
+  test(`${config.label}: inserts full message and leaves existing drafts alone`, async () => {
+    const f = await chatFixture('', provider); f.run(); await tick();
+    assert.equal(f.editor.value ?? f.editor.textContent, buildMessage(draft));
+    assert.equal(f.done(), true); assert.match(f.root.querySelector('p').textContent, new RegExp(config.label)); f.d.window.close();
+    const existing = await chatFixture('My draft', provider); existing.run();
+    assert.equal(existing.editor.value ?? existing.editor.textContent, 'My draft');
+    assert.equal(existing.done(), false); existing.d.window.close();
+  });
+}
+test('rejects unknown providers before opening a tab', async () => {
+  const bg = background();
+  for (const provider of ['constructor', '__proto__', 'other', 'https://evil.test']) {
+    assert.equal((await bg.send('LH_TRANSFER', source, { draft, provider })).ok, false);
+  }
+  assert.equal(bg.calls.length, 0);
+});
+test('adapter avoids ambiguous editors and allows copy/manual retry', async () => {
+  const f = await chatFixture('', 'claude', '<div contenteditable="true" class="ProseMirror"></div><div contenteditable="true" class="ProseMirror"></div>');
+  f.run(); assert.equal(f.done(), false); assert.equal(f.editor.textContent, '');
+  f.root.querySelector('#insert').click(); assert.match(f.root.querySelector('p').textContent, /could not be identified/);
+  f.d.window.close();
+});
+test('restores provider preference without changing prompt preferences', async () => {
+  const d = dom('<main></main>'); const w = d.window; const saved = [];
+  w.chrome = { runtime: { getURL: x => x }, storage: { local: {
+    get: async key => key === 'provider' ? { provider: 'gemini' } : { preferences: { prompt: 'Explain it simply.', preset: 'custom' } },
+    set: async data => saved.push(data)
+  } } };
+  w.eval(script('core.js')); w.eval(script('ui.js')); w.LH.mount(w.document.querySelector('main')); await tick();
+  assert.equal(w.document.getElementById('lh-provider').value, 'gemini');
+  assert.match(w.document.getElementById('lh-send').textContent, /Gemini/);
+  assert.equal(w.document.getElementById('lh-prompt').value, 'Explain it simply.');
+  w.document.getElementById('lh-provider').value = 'claude';
+  w.document.getElementById('lh-provider').dispatchEvent(new w.Event('change'));
+  assert.equal(saved[0].provider, 'claude'); assert.equal(saved[0].preferences, undefined);
+  d.window.close();
 });
